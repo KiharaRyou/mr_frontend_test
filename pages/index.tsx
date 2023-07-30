@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Row, Col, Skeleton, Image } from 'antd';
+import { Row, Col, Skeleton, Image, Space, Button } from 'antd';
 import styles from './index.module.scss';
 
 interface SizeOptionType {
@@ -33,6 +33,14 @@ export default function Home() {
     imageURL: '',
     sizeOptions: []
   });
+  const [currentSize, setCurrentSize] = useState<SizeOptionType | null>(null);
+
+  const onSizeClick = (size_id: number) => {
+    const size_index = productDetail.sizeOptions.findIndex(size => size.id === size_id);
+    if(size_index !== -1) {
+      setCurrentSize(productDetail.sizeOptions[size_index])
+    }
+  };
 
   const getData = async () => {
     setLoading(true);
@@ -62,13 +70,31 @@ export default function Home() {
           <Image src={productDetail.imageURL} style={{width: '100%'}} />
         </Col>
         <Col {...colProps}>
-        <h2 className={styles.title}>{productDetail.title}</h2>
-            <div className={styles.price}><strong>$ {productDetail.price.toFixed(2)}</strong></div>
-            <p className={styles.description}>{productDetail.description}</p>
-            <div className={styles.size}>
-              <strong>SIZE</strong>
-              <span className={styles.star}>*</span>
-            </div>
+          <h2 className={styles.title}>{productDetail.title}</h2>
+          <div className={styles.price}><strong>$ {productDetail.price.toFixed(2)}</strong></div>
+          <p className={styles.description}>{productDetail.description}</p>
+          <div className={styles.size}>
+            <strong>SIZE</strong>
+            <span className={styles.star}>*</span>
+            {currentSize !== null && <strong className={styles.currentSize}>{currentSize.label}</strong>}
+          </div>
+          <div>
+            <Space direction="vertical">
+              <Space wrap>
+                {productDetail.sizeOptions.map((size: SizeOptionType, index) => 
+                  <Button 
+                    className={currentSize?.id === size.id ? styles.currentSizeBtn : undefined}
+                    key={index} 
+                    onClick={() => {
+                      onSizeClick(size.id);
+                    }}
+                  >
+                    {size.label}
+                  </Button>
+                )}
+              </Space>
+            </Space>
+          </div>  
         </Col>
       </Row>
     </Skeleton>
