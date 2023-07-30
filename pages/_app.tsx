@@ -1,6 +1,7 @@
 import '@/styles/global.css';
 import type { AppProps } from 'next/app';
 import { Layout, Space } from 'antd';
+import GlobalContextProvider from 'contexts/global';
 
 const { Header, Content } = Layout;
 
@@ -18,10 +19,12 @@ const contentStyle: React.CSSProperties = {
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   
-  return <Space direction="vertical" style={{ width: '100%' }} size={[0, 24]}>
-            <Header style={headerStyle}></Header>
-            <Content style={contentStyle} >
-              <Component {...pageProps} />
-            </Content>  
-          </Space>    
+  return <GlobalContextProvider>
+      <Space direction="vertical" style={{ width: '100%' }} size={[0, 24]}>
+        <Header style={headerStyle}></Header>
+        <Content style={contentStyle} >
+          <Component {...pageProps} />
+        </Content>  
+      </Space>
+    </GlobalContextProvider>    
 }

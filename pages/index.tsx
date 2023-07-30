@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { Row, Col, Skeleton, Image, Space, Button } from 'antd';
+import { GlobalContext, CartItemType } from 'contexts/global';
 import styles from './index.module.scss';
 
 interface SizeOptionType {
@@ -24,6 +25,8 @@ const colProps = {
 
 export default function Home() {
 
+  const { globalState, setGlobalState } = useContext(GlobalContext);
+
   const [loading, setLoading] = useState<boolean>(true);
   const [productDetail, setProductDetail] = useState<ProductDetailType>({
     id: 0,
@@ -40,6 +43,17 @@ export default function Home() {
     if(size_index !== -1) {
       setCurrentSize(productDetail.sizeOptions[size_index])
     }
+  };
+
+  const addItem = (item: CartItemType) => {
+    const currentCartItems = [...globalState.cartItems];
+    const cartItemIndex = currentCartItems.findIndex(cartItem => cartItem.product_id === item.product_id && cartItem.size === item.size);
+    if(cartItemIndex === -1) {
+      currentCartItems.push(item);
+    } else {
+      currentCartItems[cartItemIndex].qty += 1;
+    }
+    setGlobalState({...globalState, cartItems: currentCartItems});
   };
 
   const getData = async () => {
@@ -96,6 +110,16 @@ export default function Home() {
               <Button 
                 disabled={currentSize === null}
                 type="primary"
+                onClick={() => {
+                  addItem({
+                    product_id: productDetail.id,
+                    title: productDetail.title,
+                    imageUrl: productDetail.imageURL,
+                    unit_price: productDetail.price,
+                    size: currentSize?.label,
+                    qty: 1
+                  }) 
+                }} 
               >
                 ADD TO CART
               </Button>
