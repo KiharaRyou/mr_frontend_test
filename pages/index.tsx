@@ -93,6 +93,12 @@ export default function Home() {
                   </Button>
                 )}
               </Space>
+              <Button 
+                disabled={currentSize === null}
+                type="primary"
+              >
+                ADD TO CART
+              </Button>
             </Space>
           </div>  
         </Col>
