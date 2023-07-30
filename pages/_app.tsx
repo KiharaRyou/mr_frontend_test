@@ -18,7 +18,7 @@ const contentStyle: React.CSSProperties = {
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   
-  return <Space direction="vertical" style={{ width: '100%' }} size={[0, 48]}>
+  return <Space direction="vertical" style={{ width: '100%' }} size={[0, 24]}>
             <Header style={headerStyle}></Header>
             <Content style={contentStyle} >
               <Component {...pageProps} />
