@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Row, Col, Skeleton } from 'antd';
+import { Row, Col, Skeleton, Image } from 'antd';
+import styles from './index.module.scss';
 
 interface SizeOptionType {
   id: number,
@@ -56,12 +57,18 @@ export default function Home() {
 
   return (
     <Skeleton loading={loading}>
-      <Row>
-        <Col {...colProps}>{productDetail.imageURL}</Col>
+      <Row gutter={16} style={{display: 'flex', justifyContent: 'space-evenly'}}>
+        <Col {...colProps} style={{textAlign:'center'}}>
+          <Image src={productDetail.imageURL} style={{width: '100%'}} />
+        </Col>
         <Col {...colProps}>
-          <h2>{productDetail.title}</h2>
-          <div><strong>$ {productDetail.price.toFixed(2)}</strong></div>
-          <p>{productDetail.description}</p>
+        <h2 className={styles.title}>{productDetail.title}</h2>
+            <div className={styles.price}><strong>$ {productDetail.price.toFixed(2)}</strong></div>
+            <p className={styles.description}>{productDetail.description}</p>
+            <div className={styles.size}>
+              <strong>SIZE</strong>
+              <span className={styles.star}>*</span>
+            </div>
         </Col>
       </Row>
     </Skeleton>
