@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from 'react';
 import { Row, Col, Skeleton, Image, Space, Button } from 'antd';
-import { GlobalContext, CartItemType } from 'contexts/global';
+import { GlobalContext, CartItemType } from '@/contexts/global';
 import styles from './index.module.scss';
 
 interface SizeOptionType {
@@ -78,15 +78,15 @@ export default function Home() {
 
 
   return (
-    <Skeleton loading={loading}>
+    <Skeleton loading={loading} data-testid="loading">
       <Row gutter={16} style={{display: 'flex', justifyContent: 'space-evenly'}}>
         <Col {...colProps} style={{textAlign:'center'}}>
-          <Image src={productDetail.imageURL} style={{width: '100%'}} />
+          <Image src={productDetail.imageURL} style={{width: '100%'}} data-testid="product_image"/>
         </Col>
         <Col {...colProps}>
-          <h2 className={styles.title}>{productDetail.title}</h2>
+          <h2 className={styles.title} data-testid="product_name">{productDetail.title}</h2>
           <div className={styles.price}><strong>$ {productDetail.price.toFixed(2)}</strong></div>
-          <p className={styles.description}>{productDetail.description}</p>
+          <p className={styles.description} data-testid="product_description">{productDetail.description}</p>
           <div className={styles.size}>
             <strong>SIZE</strong>
             <span className={styles.star}>*</span>
@@ -99,6 +99,7 @@ export default function Home() {
                   <Button 
                     className={currentSize?.id === size.id ? styles.currentSizeBtn : undefined}
                     key={index} 
+                    data-testid={`${size.label}_btn`}
                     onClick={() => {
                       onSizeClick(size.id);
                     }}
@@ -120,6 +121,7 @@ export default function Home() {
                     qty: 1
                   }) 
                 }} 
+                data-testid="addToCart"
               >
                 ADD TO CART
               </Button>
