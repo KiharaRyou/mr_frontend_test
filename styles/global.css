@@ -51,3 +51,22 @@ code {
   font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono,
     Bitstream Vera Sans Mono, Courier New, monospace;
 }
+
+.ant-btn-primary {
+  border-width: 2px;
+  background-color: #FFFFFF;
+  border-color: #222222;
+  color: #222222;
+  font-weight: bold;
+}
+
+.ant-btn-primary:hover:not(:disabled):not(.ant-btn-disabled) {
+  background-color: #222222 ;
+  border-color: #222222;
+  color: #FFFFFF;
+}
+
+.ant-btn-default:hover:not(:disabled):not(.ant-btn-disabled) {
+  border-color: #222222 ;
+  color: #222222 ;
+}

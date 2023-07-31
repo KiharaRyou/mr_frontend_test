@@ -1,65 +1,134 @@
-import Head from 'next/head'
-import Image from 'next/image'
+import { useEffect, useState, useContext } from 'react';
+import { Row, Col, Skeleton, Image, Space, Button } from 'antd';
+import { GlobalContext, CartItemType } from '@/contexts/global';
+import styles from './index.module.scss';
 
-import styles from '@/pages/index.module.css'
+interface SizeOptionType {
+  id: number,
+  label: string
+}
+
+interface ProductDetailType {
+  id: number,
+  title: string,
+  description: string,
+  price: number,
+  imageURL: string,
+  sizeOptions: SizeOptionType[]
+}
+
+const colProps = {
+  xs: { span: 24 },
+  sm: { span: 12 },
+  md: { span: 8 },
+}
 
 export default function Home() {
+
+  const { globalState, setGlobalState } = useContext(GlobalContext);
+
+  const [loading, setLoading] = useState<boolean>(true);
+  const [productDetail, setProductDetail] = useState<ProductDetailType>({
+    id: 0,
+    title: 'No item',
+    description: 'No description',
+    price: 0,
+    imageURL: '',
+    sizeOptions: []
+  });
+  const [currentSize, setCurrentSize] = useState<SizeOptionType | null>(null);
+
+  const onSizeClick = (size_id: number) => {
+    const size_index = productDetail.sizeOptions.findIndex(size => size.id === size_id);
+    if(size_index !== -1) {
+      setCurrentSize(productDetail.sizeOptions[size_index])
+    }
+  };
+
+  const addItem = (item: CartItemType) => {
+    const currentCartItems = [...globalState.cartItems];
+    const cartItemIndex = currentCartItems.findIndex(cartItem => cartItem.product_id === item.product_id && cartItem.size === item.size);
+    if(cartItemIndex === -1) {
+      currentCartItems.push(item);
+    } else {
+      currentCartItems[cartItemIndex].qty += 1;
+    }
+    setGlobalState({...globalState, cartItems: currentCartItems});
+  };
+
+  const getData = async () => {
+    setLoading(true);
+    
+    await fetch(`https://3sb655pz3a.execute-api.ap-southeast-2.amazonaws.com/live/product`)
+      .then((res) => res.json())
+      .then((data: ProductDetailType) => {
+        setProductDetail(data);
+      })
+      .catch(error => {
+        console.log(error);
+      })
+
+    setLoading(false); 
+    
+  }
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing <code>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a href="https://vercel.com/new" className={styles.card}>
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
-    </div>
+    <Skeleton loading={loading} data-testid="loading">
+      <Row gutter={16} style={{display: 'flex', justifyContent: 'space-evenly'}}>
+        <Col {...colProps} style={{textAlign:'center'}}>
+          <Image src={productDetail.imageURL} style={{width: '100%'}} data-testid="product_image"/>
+        </Col>
+        <Col {...colProps}>
+          <h2 className={styles.title} data-testid="product_name">{productDetail.title}</h2>
+          <div className={styles.price}><strong>$ {productDetail.price.toFixed(2)}</strong></div>
+          <p className={styles.description} data-testid="product_description">{productDetail.description}</p>
+          <div className={styles.size}>
+            <strong>SIZE</strong>
+            <span className={styles.star}>*</span>
+            {currentSize !== null && <strong className={styles.currentSize}>{currentSize.label}</strong>}
+          </div>
+          <div>
+            <Space direction="vertical">
+              <Space wrap>
+                {productDetail.sizeOptions.map((size: SizeOptionType, index) => 
+                  <Button 
+                    className={currentSize?.id === size.id ? styles.currentSizeBtn : undefined}
+                    key={index} 
+                    data-testid={`${size.label}_btn`}
+                    onClick={() => {
+                      onSizeClick(size.id);
+                    }}
+                  >
+                    {size.label}
+                  </Button>
+                )}
+              </Space>
+              <Button 
+                disabled={currentSize === null}
+                type="primary"
+                onClick={() => {
+                  addItem({
+                    product_id: productDetail.id,
+                    title: productDetail.title,
+                    imageUrl: productDetail.imageURL,
+                    unit_price: productDetail.price,
+                    size: currentSize?.label,
+                    qty: 1
+                  }) 
+                }} 
+                data-testid="addToCart"
+              >
+                ADD TO CART
+              </Button>
+            </Space>
+          </div>  
+        </Col>
+      </Row>
+    </Skeleton>
   )
 }
